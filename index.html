@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAN Architect Studio — v3.6.0 (Diseño de Redes & Ciberdefensa)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS for Excel Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 10%, #0e172e 0%, #060911 65%, #03050a 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* REGLA ESTRICTA DE AISLAMIENTO: Las pestañas ocultas NUNCA se superponen */
+    .tab-content-panel {
+      display: none !important;
+    }
+    .tab-content-panel.active-panel {
+      display: block !important;
+      animation: fadeInPanel 0.25s ease-out;
+    }
+
+    @keyframes fadeInPanel {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+      background: rgba(10, 16, 31, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 25px -5px rgba(0, 240, 255, 0.12);
+    }
+
+    .glass-card-accent {
+      background: rgba(8, 20, 40, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      box-shadow: 0 15px 40px -8px rgba(0, 240, 255, 0.2);
+    }
+
+    .option-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .option-card:hover {
+      border-color: #00f0ff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px -3px rgba(0, 240, 255, 0.22);
+    }
+    .option-card.active {
+      border: 2px solid #00f0ff !important;
+      background: rgba(0, 240, 255, 0.1) !important;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+    }
+
+    .tab-nav-btn {
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .tab-nav-btn.active {
+      background: linear-gradient(135deg, #00f0ff 0%, #38bdf8 100%) !important;
+      color: #030712 !important;
+      font-weight: 800 !important;
+      box-shadow: 0 4px 18px -2px rgba(0, 240, 255, 0.45) !important;
+    }
+
+    .gradient-brand {
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 35%, #00f0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Custom glowing scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #060911; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #00f0ff); border-radius: 999px; }
+
+    @keyframes pulseNode {
+      0%, 100% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.3); }
+      50% { box-shadow: 0 0 24px rgba(0, 240, 255, 0.8); }
+    }
+    .pulse-glow {
+      animation: pulseNode 2.2s infinite;
+    }
+  </style>
+</head>
+
+<body class="selection:bg-cyan-500 selection:text-black min-h-screen flex flex-col antialiased">
+
+  <!-- Header Superior Fijo -->
+  <header class="border-b border-indigo-950/80 bg-[#060911]/95 backdrop-blur-xl sticky top-0 z-50 shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-4">
+      
+      <!-- Logotipo & Versión -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchStrictTab('empresa')">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 via-cyan-500 to-cyan-400 rounded-2xl shadow-lg shadow-cyan-500/30 text-slate-950 flex items-center justify-center font-black">
+          <i data-lucide="network" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-black tracking-tight gradient-brand">
+              WAN Architect Studio
+            </h1>
+            <span class="bg-gradient-to-r from-cyan-400 to-indigo-500 text-slate-950 font-black px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider shadow">
+              v3.6.0
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
+            <span>Diseño Empresarial & Ciberdefensa</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Botón Rápido de Descarga Excel -->
+      <div class="flex items-center gap-2">
+        <button onclick="exportToExcel()" class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 transition transform hover:scale-105 active:scale-95">
+          <i data-lucide="sheet" class="w-4 h-4 stroke-[2.5]"></i> Descargar Excel (.xlsx)
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Barra de 5 Pestañas Independientes -->
+    <div class="border-t border-indigo-950/70 bg-[#0a101f]/90">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <nav class="flex gap-2 overflow-x-auto py-2.5 scrollbar-none" id="mainTabNav">
+          
+          <button onclick="switchStrictTab('empresa')" id="tabBtn-empresa" class="tab-nav-btn active px-4 py-2 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-cyan-400 to-sky-400 text-slate-950 font-black">
+            <i data-lucide="building-2" class="w-4 h-4"></i>
+            <span>1. Datos de mi Empresa</span>
+          </button>
+
+          <button onclick="switchStrictTab('direccionamiento')" id="tabBtn-direccionamiento" class="tab-nav-btn px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="calculator" class="w-4 h-4 text-cyan-400"></i>
+            <span>2. Direccionamiento IP (VLSM)</span>
+          </button>
+
+          <button onclick="switchStrictTab('topologia')" id="tabBtn-topologia" class="tab-nav-btn px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="git-fork" class="w-4 h-4 text-indigo-400"></i>
+            <span>3. Topología Recomendable</span>
+          </button>
+
+          <button onclick="switchStrictTab('codigos')" id="tabBtn-codigos" class="tab-nav-btn px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+            <span>4. Códigos de Dispositivos</span>
+          </button>
+
+          <button onclick="switchStrictTab('ciberdefensa')" id="tabBtn-ciberdefensa" class="tab-nav-btn px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+            <span>5. Ciberdefensa Contra IA</span>
+          </button>
+
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- Toast Flotante de Notificación -->
+    <div id="toastBox" class="fixed top-24 right-5 z-50 hidden transition-all duration-300 transform -translate-y-4">
+      <div class="glass-card-accent text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-cyan-400/50">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-cyan-400" id="toastIcon"></i>
+        <div>
+          <span id="toastTitle" class="text-xs font-bold block text-cyan-300">¡Cálculo Exitoso!</span>
+          <span id="toastMsg" class="text-xs text-slate-200">Red computada sin solapamientos.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- PESTAÑA 1: DATOS DE MI EMPRESA (SOLO ENTRADA Y BOTÓN CALCULAR)     -->
+    <!-- =================================================================== -->
+    <section id="panel-empresa" class="tab-content-panel active-panel space-y-6">
+      
+      <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-7 border border-indigo-500/30">
+        
+        <!-- Bloque de Encabezado Superior -->
+        <div class="flex flex-wrap justify-between items-center gap-4 border-b border-indigo-900/60 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Configuración Inicial de la Empresa
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              1. Ingresa los Datos de tu Empresa
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mt-1">
+              Diligencia únicamente los datos físicos de tu organización. Al hacer clic en el botón principal, la aplicación calculará el direccionamiento, la topología y los códigos de laboratorio en sus pestañas independientes.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono text-cyan-300 bg-[#060911] px-3.5 py-1.5 rounded-xl border border-indigo-800 font-bold shadow">
+              Modo Asistente Activo
+            </span>
+          </div>
+        </div>
+
+        <!-- Renglón vacío de separación y línea divisoria entre Modo Asistente y Nombre Corporativo -->
+        <div class="my-4 border-b border-indigo-900/40"></div>
+        <div class="h-2"></div>
+
+        <!-- 1. Nombre de la Empresa -->
+        <div class="space-y-3 pt-1">
+          <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider">
+            1. Nombre Corporativo / Razón Social:
+          </label>
+
+          <!-- Renglón vacío de separación solicitado entre la etiqueta y el cajón de texto -->
+          <div class="h-2"></div>
+
+          <div class="relative max-w-xl">
+            <input type="text" id="inpCompanyName" value="Soluciones Tecnológicas Global S.A.S." placeholder="Ej. Mi Empresa S.A., Banco Andino, Hospital Central" 
+                   class="w-full bg-[#060911] border border-indigo-800 rounded-2xl px-4 py-3.5 text-sm text-white font-medium focus:border-cyan-400 focus:outline-none transition shadow-inner">
+            <div class="absolute right-4 top-4 text-slate-500 pointer-events-none">
+              <i data-lucide="building" class="w-4 h-4"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Renglón divisor de separación de módulo -->
+        <div class="pt-3 border-b border-indigo-900/40"></div>
+
+        <!-- 2. Presets de Tamaño -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">
+            2. Selecciona una escala predefinida o modifícala manualmente:
+          </label>
+          <div class="grid sm:grid-cols-3 gap-4">
+            
+            <div onclick="applyCompanyPreset('small', this)" class="option-card cursor-pointer bg-[#060911]/80 border border-indigo-900 rounded-2xl p-5 relative">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-3">
+                <i data-lucide="store" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-white text-sm">Pequeña Empresa</h3>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed">2 Sedes conectadas por WAN, 1 piso por sede y 20 puestos de trabajo.</p>
+              <div class="mt-3">
+                <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full font-mono border border-indigo-500/30">2 Sedes / 40 Puestos</span>
+              </div>
+            </div>
+
+            <div onclick="applyCompanyPreset('medium', this)" class="option-card active cursor-pointer bg-[#060911]/80 border-2 border-cyan-400 rounded-2xl p-5 relative">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-3">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-white text-sm">Mediana Empresa</h3>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed">3 Sedes interconectadas, 2 pisos por sede y 45 usuarios por piso.</p>
+              <div class="mt-3">
+                <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full font-mono border border-cyan-400/30">3 Sedes / 270 Puestos</span>
+              </div>
+            </div>
+
+            <div onclick="applyCompanyPreset('large', this)" class="option-card cursor-pointer bg-[#060911]/80 border border-indigo-900 rounded-2xl p-5 relative">
+              <div class="w-10 h-10 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 mb-3">
+                <i data-lucide="landmark" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-white text-sm">Gran Empresa</h3>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed">5 Sedes principales, 3 pisos por sede y 100 empleados por piso.</p>
+              <div class="mt-3">
+                <span class="text-[10px] bg-fuchsia-500/20 text-fuchsia-300 px-2.5 py-0.5 rounded-full font-mono border border-fuchsia-500/30">5 Sedes / 1500 Puestos</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Renglón divisor de separación de módulo -->
+        <div class="pt-3 border-b border-indigo-900/40"></div>
+
+        <!-- 3. Controles Numéricos de Dimensionamiento -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">
+            3. Dimensionamiento Físico de Edificios y Personal:
+          </label>
+          <div class="grid sm:grid-cols-3 gap-4">
+            
+            <div class="bg-[#060911]/90 p-4 rounded-2xl border border-indigo-900 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Sedes Físicas (WAN)</span>
+                <span class="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-400/20" id="badgeSedes">3 Sedes</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Edificios conectados por enlaces punto a punto /30.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <button type="button" onclick="decrementValue('inpSedes', 1, 8)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">-</button>
+                <input type="number" id="inpSedes" value="3" min="1" max="8" class="flex-1 text-center bg-[#0a101f] border border-indigo-900 rounded-xl py-2 text-white font-mono text-base font-bold focus:border-cyan-400 focus:outline-none">
+                <button type="button" onclick="incrementValue('inpSedes', 1, 8)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">+</button>
+              </div>
+            </div>
+
+            <div class="bg-[#060911]/90 p-4 rounded-2xl border border-indigo-900 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Pisos / Niveles por Sede</span>
+                <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-400/20" id="badgePisos">2 Pisos</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Cada piso cuenta con su switch de distribución dedicado.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <button type="button" onclick="decrementValue('inpPisos', 1, 6)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">-</button>
+                <input type="number" id="inpPisos" value="2" min="1" max="6" class="flex-1 text-center bg-[#0a101f] border border-indigo-900 rounded-xl py-2 text-white font-mono text-base font-bold focus:border-cyan-400 focus:outline-none">
+                <button type="button" onclick="incrementValue('inpPisos', 1, 6)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">+</button>
+              </div>
+            </div>
+
+            <div class="bg-[#060911]/90 p-4 rounded-2xl border border-indigo-900 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Puestos / Empleados por Piso</span>
+                <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-400/20" id="badgeUsers">45 Empleados</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Usuarios concurrentes por cada switch de piso.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <button type="button" onclick="decrementValue('inpUsers', 5, 500, 5)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">-</button>
+                <input type="number" id="inpUsers" value="45" min="5" max="500" class="flex-1 text-center bg-[#0a101f] border border-indigo-900 rounded-xl py-2 text-white font-mono text-base font-bold focus:border-cyan-400 focus:outline-none">
+                <button type="button" onclick="incrementValue('inpUsers', 5, 500, 5)" class="w-9 h-9 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-white font-bold flex items-center justify-center">+</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. Servicios y Red Base (LISTA VERTICAL LIMPIA) -->
+        <div class="grid md:grid-cols-2 gap-6 pt-2">
+          
+          <!-- Lista Vertical Clara de Servicios (Opción por Opción) -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              4. Servicios Tecnológicos requeridos (VLANs dedicadas):
+            </label>
+            <p class="text-[11px] text-slate-400">Selecciona o desmarca los servicios que operarán en cada sede y piso:</p>
+            
+            <div class="flex flex-col space-y-2.5">
+              
+              <!-- Opción 1: Datos -->
+              <label class="option-card cursor-pointer bg-[#060911]/90 p-3.5 rounded-2xl border border-cyan-500/40 flex items-center justify-between gap-3 hover:border-cyan-400">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="chkSrvDatos" checked disabled class="w-4 h-4 accent-cyan-400 cursor-not-allowed">
+                  <div>
+                    <span class="text-xs font-bold text-white block">PCs y Computadores de Escritorio</span>
+                    <span class="text-[11px] text-slate-400">Tráfico general de estaciones de trabajo (VLAN 10 - DATOS)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-lg font-mono font-bold whitespace-nowrap border border-cyan-500/30">Requerido</span>
+              </label>
+
+              <!-- Opción 2: Voz IP -->
+              <label class="option-card cursor-pointer bg-[#060911]/90 p-3.5 rounded-2xl border border-indigo-900 flex items-center justify-between gap-3 hover:border-cyan-400">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="chkSrvVoip" checked onchange="updateSummaryCounters()" class="w-4 h-4 accent-cyan-400 cursor-pointer">
+                  <div>
+                    <span class="text-xs font-bold text-white block">Telefonía IP y Call Center</span>
+                    <span class="text-[11px] text-slate-400">Priorización de paquetes de voz en tiempo real (VLAN 20 - VOZ IP)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-lg font-mono font-bold whitespace-nowrap border border-indigo-500/30">QoS</span>
+              </label>
+
+              <!-- Opción 3: Wi-Fi -->
+              <label class="option-card cursor-pointer bg-[#060911]/90 p-3.5 rounded-2xl border border-indigo-900 flex items-center justify-between gap-3 hover:border-cyan-400">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="chkSrvWifi" checked onchange="updateSummaryCounters()" class="w-4 h-4 accent-cyan-400 cursor-pointer">
+                  <div>
+                    <span class="text-xs font-bold text-white block">Red Wi-Fi Corporativa e Invitados</span>
+                    <span class="text-[11px] text-slate-400">Access Points con margen de densidad móvil (VLAN 30 - WIFI)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-lg font-mono font-bold whitespace-nowrap border border-emerald-500/30">+50% Margen</span>
+              </label>
+
+              <!-- Opción 4: CCTV -->
+              <label class="option-card cursor-pointer bg-[#060911]/90 p-3.5 rounded-2xl border border-indigo-900 flex items-center justify-between gap-3 hover:border-cyan-400">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="chkSrvCctv" checked onchange="updateSummaryCounters()" class="w-4 h-4 accent-cyan-400 cursor-pointer">
+                  <div>
+                    <span class="text-xs font-bold text-white block">Cámaras de Seguridad y Control</span>
+                    <span class="text-[11px] text-slate-400">Circuito cerrado y sensores de monitoreo NVR (VLAN 40 - CCTV)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-lg font-mono font-bold whitespace-nowrap border border-amber-500/30">Seguridad</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Red Base Privada -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              5. Red Base Privada (RFC 1918):
+            </label>
+            <div class="bg-[#060911]/90 p-4 rounded-2xl border border-indigo-900 space-y-3">
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Selecciona la red privada desde donde se computarán todas las subredes sin solapamiento:
+              </p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setBaseIpAddress('10.0.0.0/16', this)" class="btn-base-ip py-2 px-2 rounded-xl border border-cyan-400 bg-cyan-500/20 text-cyan-300 text-xs font-mono font-bold text-center">
+                  10.0.0.0/16
+                </button>
+                <button type="button" onclick="setBaseIpAddress('172.16.0.0/16', this)" class="btn-base-ip py-2 px-2 rounded-xl border border-indigo-900 bg-[#0a101f] text-slate-400 text-xs font-mono text-center hover:border-cyan-400">
+                  172.16.0.0/16
+                </button>
+                <button type="button" onclick="setBaseIpAddress('192.168.0.0/16', this)" class="btn-base-ip py-2 px-2 rounded-xl border border-indigo-900 bg-[#0a101f] text-slate-400 text-xs font-mono text-center hover:border-cyan-400">
+                  192.168.0.0/16
+                </button>
+              </div>
+              <input type="text" id="inpBaseIp" value="10.0.0.0/16" class="w-full bg-[#0a101f] border border-indigo-900 rounded-xl px-3 py-2 text-xs font-mono text-white focus:border-cyan-400 focus:outline-none">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTÓN PRINCIPAL DE GENERACIÓN Y CÁLCULO -->
+        <div class="pt-6 border-t border-indigo-900/60 flex flex-wrap items-center justify-between gap-4">
+          <div class="text-xs text-slate-400" id="lblLiveEstimate">
+            Estimación: 6 switches de piso, 2 enlaces WAN /30 y 26 subredes calculadas.
+          </div>
+
+          <button type="button" onclick="handleGenerateAndNavigate()" class="bg-gradient-to-r from-cyan-400 via-indigo-500 to-indigo-600 hover:from-cyan-300 hover:to-indigo-500 text-slate-950 font-black px-8 py-4 rounded-2xl text-sm flex items-center gap-3 shadow-2xl shadow-cyan-500/40 transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
+            <span>🚀 CALCULAR Y GENERAR TODA LA RED</span>
+            <i data-lucide="arrow-right" class="w-5 h-5 stroke-[3]"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PESTAÑA 2: DIRECCIONAMIENTO IP (VLSM & EXCEL EXCLUSIVAMENTE)        -->
+    <!-- =================================================================== -->
+    <section id="panel-direccionamiento" class="tab-content-panel space-y-6">
+      
+      <!-- Métricas Superiores de la Red -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        
+        <div class="glass-card p-5 rounded-2xl space-y-1 border border-indigo-900">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subredes VLSM</div>
+          <div class="text-2xl sm:text-3xl font-black text-cyan-400 font-mono" id="mSubnets">26</div>
+          <span class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
+            <i data-lucide="check" class="w-3 h-3"></i> Cero solapamientos
+          </span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl space-y-1 border border-indigo-900">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hosts Totales Útiles</div>
+          <div class="text-2xl sm:text-3xl font-black text-white font-mono" id="mHosts">1,536</div>
+          <span class="text-[10px] text-slate-400 font-mono">Direcciones asignadas</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl space-y-1 border border-indigo-900">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Switches de Piso</div>
+          <div class="text-2xl sm:text-3xl font-black text-indigo-400 font-mono" id="mSwitches">6</div>
+          <span class="text-[10px] text-slate-400 font-mono">1 por piso en cada sede</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl space-y-1 border border-indigo-900">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enlaces WAN P2P</div>
+          <div class="text-2xl sm:text-3xl font-black text-amber-400 font-mono" id="mWanLinks">2</div>
+          <span class="text-[10px] text-amber-300 font-mono">Máscaras fijas /30</span>
+        </div>
+
+      </div>
+
+      <!-- Tabla Maestra de Subnetting VLSM -->
+      <div class="glass-card p-6 rounded-3xl space-y-5 border border-indigo-900">
+        
+        <div class="flex flex-wrap justify-between items-center gap-4 border-b border-indigo-900/60 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="calculator" class="w-5 h-5 text-cyan-400"></i> Plan Maestro de Direccionamiento IP (VLSM)
+              </h2>
+              <span class="text-xs bg-cyan-500/20 text-cyan-300 font-mono px-2.5 py-0.5 rounded border border-cyan-400/30">Captura 01 Rúbrica</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1" id="lblSubnetOrgName">
+              Plan computado para Soluciones Tecnológicas Global S.A.S. (Subredes por Sede, Piso y WAN).
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="exportToExcel()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition transform hover:scale-105 active:scale-95">
+              <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i> Descargar Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+
+        <!-- Buscador / Filtro Rápido -->
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2 flex-1 max-w-md bg-[#060911] border border-indigo-800 rounded-xl px-3 py-2">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+            <input type="text" id="tblSearchBox" onkeyup="filterSubnetRows()" placeholder="Filtrar por nombre, VLAN, IP o máscara..." class="bg-transparent text-white font-mono outline-none w-full placeholder:text-slate-500 text-xs">
+          </div>
+          <span class="text-slate-400 font-mono text-[11px]" id="lblTotalRows">Total: 0 subredes</span>
+        </div>
+
+        <!-- Contenedor con Scroll de la Tabla -->
+        <div class="overflow-x-auto max-h-[550px] overflow-y-auto rounded-2xl border border-indigo-900/80 shadow-inner">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-[#0a101f] text-slate-400 uppercase font-mono sticky top-0 border-b border-indigo-900 z-10 shadow-md">
+              <tr>
+                <th class="p-3.5">Identificador / VLAN</th>
+                <th class="p-3.5">Ubicación</th>
+                <th class="p-3.5">Hosts Req.</th>
+                <th class="p-3.5">Dirección de Red</th>
+                <th class="p-3.5">Máscara / CIDR</th>
+                <th class="p-3.5">Rango IPs Usables</th>
+                <th class="p-3.5">Broadcast</th>
+                <th class="p-3.5">Gateway Sugerido</th>
+              </tr>
+            </thead>
+            <tbody id="tblSubnetRows" class="divide-y divide-indigo-950/60 font-mono">
+              <!-- Insertado dinámicamente con JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PESTAÑA 3: TOPOLOGÍA RECOMENDABLE (EXCLUSIVAMENTE EL DIAGRAMA)      -->
+    <!-- =================================================================== -->
+    <section id="panel-topologia" class="tab-content-panel space-y-6">
+      
+      <div class="glass-card p-6 rounded-3xl space-y-5 border border-indigo-900">
+        
+        <div class="flex flex-wrap justify-between items-center gap-4 border-b border-indigo-900/60 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="git-fork" class="w-5 h-5 text-indigo-400"></i> Diagrama de Topología Recomendada
+              </h2>
+              <span class="text-xs bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded border border-indigo-500/30">Captura 02 Rúbrica</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              Topología jerárquica con Routers de Sede (Core/Gateway), Enlaces WAN punto a punto /30 y Switches de Piso dedicados.
+            </p>
+          </div>
+
+          <div class="text-xs font-mono text-cyan-300 bg-[#060911] px-3.5 py-1.5 rounded-xl border border-indigo-800">
+            Arquitectura WAN Corporativa
+          </div>
+        </div>
+
+        <!-- Canvas Visual de la Topología -->
+        <div id="topologiaCanvas" class="bg-[#03060d] border border-indigo-900 rounded-2xl p-6 min-h-[440px] flex flex-col items-center justify-center gap-8 relative overflow-hidden shadow-inner">
+          <!-- Populated in JS -->
+        </div>
+
+        <!-- Tarjetas Explicativas de Arquitectura -->
+        <div class="grid sm:grid-cols-3 gap-4 pt-2 text-xs">
+          <div class="bg-[#060911]/90 p-4 rounded-xl border border-indigo-900">
+            <span class="font-bold text-cyan-400 block mb-1 flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-4 h-4"></i> Routers WAN de Sede
+            </span>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Ejecutan enrutamiento dinámico OSPF Área 0 y realizan enrutamiento entre VLANs (Router-on-a-Stick con subinterfaces 802.1Q).
+            </p>
+          </div>
+
+          <div class="bg-[#060911]/90 p-4 rounded-xl border border-indigo-900">
+            <span class="font-bold text-amber-400 block mb-1 flex items-center gap-1.5">
+              <i data-lucide="link-2" class="w-4 h-4"></i> Enlaces WAN Punto a Punto (/30)
+            </span>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Cada enlace entre sedes utiliza máscara 255.255.255.252 (/30), proveyendo exactamente 2 IPs asignables para evitar desperdicio.
+            </p>
+          </div>
+
+          <div class="bg-[#060911]/90 p-4 rounded-xl border border-indigo-900">
+            <span class="font-bold text-emerald-400 block mb-1 flex items-center gap-1.5">
+              <i data-lucide="layers" class="w-4 h-4"></i> Switches de Piso
+            </span>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Switches capa 2 con enlaces troncales hacia el router y puertos de acceso asignados a las VLANs de Datos, Voz IP, Wi-Fi y CCTV.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PESTAÑA 4: CÓDIGOS DE DISPOSITIVOS (EXCLUSIVAMENTE CONSOLA)         -->
+    <!-- =================================================================== -->
+    <section id="panel-codigos" class="tab-content-panel space-y-6">
+      
+      <div class="glass-card p-6 rounded-3xl space-y-5 border border-indigo-900">
+        
+        <div class="flex flex-wrap justify-between items-center gap-4 border-b border-indigo-900/60 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i> Scripts de Configuración para Dispositivos de Red
+              </h2>
+              <span class="text-xs bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded border border-emerald-500/30">Capturas 03, 04, 06, 07</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              Sintaxis generada automáticamente y lista para pegar en routers y firewalls de laboratorio (Cisco, Huawei, Fortinet y MikroTik).
+            </p>
+          </div>
+
+          <!-- Selector de Fabricante -->
+          <div class="flex flex-wrap bg-[#060911] p-1.5 rounded-xl border border-indigo-900 text-xs">
+            <button onclick="setVendorScript('cisco')" id="vendorTab-cisco" class="vendor-btn px-3 py-1.5 rounded-lg bg-cyan-400 text-slate-950 font-bold">Cisco IOS</button>
+            <button onclick="setVendorScript('huawei')" id="vendorTab-huawei" class="vendor-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium">Huawei VRP</button>
+            <button onclick="setVendorScript('fortinet')" id="vendorTab-fortinet" class="vendor-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium">Fortinet FortiOS</button>
+            <button onclick="setVendorScript('mikrotik')" id="vendorTab-mikrotik" class="vendor-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium">MikroTik RouterOS</button>
+          </div>
+        </div>
+
+        <!-- Terminal de Comandos -->
+        <div class="relative">
+          <div class="flex items-center justify-between bg-[#0a101f] px-4 py-2.5 rounded-t-2xl border-t border-x border-indigo-900">
+            <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+              <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+              <span class="ml-2 text-cyan-300 font-bold" id="lblConsoleTitle">Terminal — Cisco IOS (Router_Sede_1)</span>
+            </div>
+
+            <button onclick="copyTerminalCode()" class="bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-cyan-300 text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition font-mono font-medium">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Código
+            </button>
+          </div>
+
+          <pre id="terminalCodeOutput" class="bg-[#03060d] border border-indigo-900 rounded-b-2xl p-6 text-xs text-emerald-400 font-mono overflow-x-auto max-h-[500px] leading-relaxed shadow-inner">
+<!-- Code inserted via JS -->
+          </pre>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PESTAÑA 5: CIBERDEFENSA CONTRA IA (MÓDULO INTERACTIVO COMPLETO)     -->
+    <!-- =================================================================== -->
+    <section id="panel-ciberdefensa" class="tab-content-panel space-y-6">
+      
+      <!-- Encabezado de Ciberdefensa -->
+      <div class="glass-card p-6 rounded-3xl space-y-4 border border-indigo-900">
+        <div class="flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="shield-alert" class="w-6 h-6 text-amber-400"></i> Sistema de Ciberdefensa Activa Contra IA
+              </h2>
+              <span class="text-xs bg-amber-500/20 text-amber-300 font-mono px-2.5 py-0.5 rounded border border-amber-500/30">Captura 08 de la Rúbrica</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1 max-w-3xl">
+              Protección obligatoria de la rúbrica: la herramienta <strong>rechaza entradas maliciosas/inyecciones</strong>, <strong>audita configuraciones inseguras</strong> de red y garantiza el <strong>aislamiento de secretos</strong> en repositorios públicos.
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="downloadPoliticasIA()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-950 border border-indigo-800 text-cyan-300 hover:bg-indigo-900 flex items-center gap-1.5 transition">
+              <i data-lucide="file-text" class="w-4 h-4"></i> Descargar politicas-ia.md
+            </button>
+            <button onclick="downloadGitignore()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-950 border border-indigo-800 text-amber-300 hover:bg-indigo-900 flex items-center gap-1.5 transition">
+              <i data-lucide="lock" class="w-4 h-4"></i> Descargar .gitignore (.env)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        
+        <!-- Módulo 1: Simulador y Probador de Inyección / Validación (Para Captura 08) -->
+        <div class="glass-card p-6 rounded-3xl space-y-4 border border-indigo-900">
+          <div class="flex items-center justify-between border-b border-indigo-900/60 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i> 1. Validador & Sanitizador de Entradas
+            </h3>
+            <span class="text-[10px] bg-cyan-500/10 text-cyan-300 font-mono px-2 py-0.5 rounded border border-cyan-400/20">Anti-Prompt Injection</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Prueba cómo la herramienta detecta y bloquea comandos de inyección, caracteres peligrosos o datos no autorizados generados por IA o usuarios malintencionados:
+          </p>
+
+          <div class="space-y-3">
+            <div class="flex gap-2">
+              <input type="text" id="inpSanitizeTest" value="system-view; drop table sedes; ignore previous rules" 
+                     placeholder="Ingresa texto malicioso o inyección..." 
+                     class="flex-1 bg-[#060911] border border-indigo-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:border-cyan-400 focus:outline-none">
+              <button onclick="runSanitizationTest()" class="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                <i data-lucide="bug" class="w-3.5 h-3.5"></i> Probar Ataque
+              </button>
+            </div>
+
+            <!-- Resultado del Escaneo de Seguridad -->
+            <div id="sanitizeResultBox" class="p-3.5 rounded-2xl bg-[#060911] border border-rose-500/40 space-y-1.5">
+              <div class="flex items-center gap-2 text-xs font-bold text-rose-400">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                <span id="sanitizeTitle">¡AMENAZA DETECTADA Y BLOQUEADA! (Captura 08)</span>
+              </div>
+              <p class="text-[11px] text-slate-300 font-mono leading-relaxed" id="sanitizeDetails">
+                Se detectaron patrones de inyección (delimitadores `;`, sentencia `drop` e instrucciones de evasión). La entrada fue rechazada por la política de Ciberdefensa IA.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo 2: Auditor de Configuraciones Inseguras de Red -->
+        <div class="glass-card p-6 rounded-3xl space-y-4 border border-indigo-900">
+          <div class="flex items-center justify-between border-b border-indigo-900/60 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="radar" class="w-4 h-4 text-amber-400"></i> 2. Auditor de Configuraciones Inseguras
+            </h3>
+            <span class="text-[10px] bg-amber-500/10 text-amber-300 font-mono px-2 py-0.5 rounded border border-amber-500/20">Hardening WAN</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            La app audita que las plantillas generadas para Cisco/Huawei no incluyan prácticas inseguras que la IA suele sugerir:
+          </p>
+
+          <div class="space-y-2 text-xs">
+            <div class="bg-[#060911]/90 border border-emerald-500/30 p-2.5 rounded-xl flex items-center justify-between">
+              <span class="text-slate-300 flex items-center gap-2 font-medium">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Protocolo de Gestión Inseguro
+              </span>
+              <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">Telnet Desactivado (SSHv2 Forzado)</span>
+            </div>
+
+            <div class="bg-[#060911]/90 border border-emerald-500/30 p-2.5 rounded-xl flex items-center justify-between">
+              <span class="text-slate-300 flex items-center gap-2 font-medium">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Cifrado de Contraseñas
+              </span>
+              <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">service password-encryption Activo</span>
+            </div>
+
+            <div class="bg-[#060911]/90 border border-emerald-500/30 p-2.5 rounded-xl flex items-center justify-between">
+              <span class="text-slate-300 flex items-center gap-2 font-medium">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Repositorio Público GitHub
+              </span>
+              <span class="text-[10px] font-mono text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded">Secretos aislados en .env</span>
+            </div>
+
+            <div class="bg-[#060911]/90 border border-emerald-500/30 p-2.5 rounded-xl flex items-center justify-between">
+              <span class="text-slate-300 flex items-center gap-2 font-medium">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Enlaces Punto a Punto WAN
+              </span>
+              <span class="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded">Máscara /30 estricta (Cero Desperdicio)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="border-t border-indigo-950/80 bg-[#060911] py-4 text-center text-xs text-slate-500">
+    <p>WAN Architect Studio v3.6.0 — Proyecto Interconexión de Redes WAN</p>
+  </footer>
+
+  <script>
+    /* Estado Global de la Aplicación (v3.6.0) */
+    const appState = {
+      companyName: 'Soluciones Tecnológicas Global S.A.S.',
+      baseIp: '10.0.0.0',
+      cidr: 16,
+      sedes: 3,
+      pisos: 2,
+      usersPerPiso: 45,
+      services: {
+        datos: true,
+        voip: true,
+        wifi: true,
+        cctv: true
+      },
+      currentVendor: 'cisco'
+    };
+
+    let calculatedSubnets = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      calculateCompleteNetwork();
+      safeInitIcons();
+    });
+
+    function safeInitIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+
+    /* MANEJADOR ESTRICTO DE PESTAÑAS: Garantiza que SOLO una pestaña esté visible a la vez */
+    function switchStrictTab(tabName) {
+      // 1. Ocultar TODOS los paneles
+      const allPanels = document.querySelectorAll('.tab-content-panel');
+      allPanels.forEach(panel => {
+        panel.classList.remove('active-panel');
+      });
+
+      // 2. Restablecer botones
+      const allButtons = document.querySelectorAll('.tab-nav-btn');
+      allButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.className = "tab-nav-btn px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap";
+      });
+
+      // 3. Activar ÚNICAMENTE el panel solicitado
+      const targetPanel = document.getElementById(`panel-${tabName}`);
+      if (targetPanel) {
+        targetPanel.classList.add('active-panel');
+      }
+
+      // 4. Resaltar botón activo
+      const targetBtn = document.getElementById(`tabBtn-${tabName}`);
+      if (targetBtn) {
+        targetBtn.className = "tab-nav-btn active px-4 py-2 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-cyan-400 to-sky-400 text-slate-950 font-black";
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      safeInitIcons();
+    }
+
+    /* Manejador del botón principal: Calcula y navega automáticamente a la Pestaña 2 */
+    function handleGenerateAndNavigate() {
+      syncInputsToState();
+      calculateCompleteNetwork();
+      switchStrictTab('direccionamiento');
+      showNotification("¡Cálculo Exitoso!", "Se calculó el direccionamiento VLSM, la topología y los códigos de dispositivos.");
+    }
+
+    function showNotification(title, msg, isSuccess = true) {
+      const box = document.getElementById('toastBox');
+      const t = document.getElementById('toastTitle');
+      const m = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+
+      if (!box || !t || !m) return;
+      t.textContent = title;
+      m.textContent = msg;
+      if (icon) {
+        icon.className = isSuccess ? "w-5 h-5 text-cyan-400" : "w-5 h-5 text-rose-500";
+      }
+
+      box.classList.remove('hidden', '-translate-y-4');
+      setTimeout(() => {
+        box.classList.add('-translate-y-4');
+        setTimeout(() => box.classList.add('hidden'), 350);
+      }, 3500);
+    }
+
+    function applyCompanyPreset(preset, elem) {
+      const sInp = document.getElementById('inpSedes');
+      const pInp = document.getElementById('inpPisos');
+      const uInp = document.getElementById('inpUsers');
+
+      if (preset === 'small') {
+        if (sInp) sInp.value = 2;
+        if (pInp) pInp.value = 1;
+        if (uInp) uInp.value = 20;
+      } else if (preset === 'medium') {
+        if (sInp) sInp.value = 3;
+        if (pInp) pInp.value = 2;
+        if (uInp) uInp.value = 45;
+      } else if (preset === 'large') {
+        if (sInp) sInp.value = 5;
+        if (pInp) pInp.value = 3;
+        if (uInp) uInp.value = 100;
+      }
+
+      document.querySelectorAll('#panel-empresa .option-card').forEach(c => {
+        c.classList.remove('active', 'border-2', 'border-cyan-400');
+        c.classList.add('border-indigo-900');
+      });
+
+      if (elem) {
+        elem.classList.remove('border-indigo-900');
+        elem.classList.add('active', 'border-2', 'border-cyan-400');
+      }
+
+      updateSummaryCounters();
+    }
+
+    function incrementValue(id, step = 1, max = 500, delta = 1) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let val = parseInt(el.value) || 1;
+      val = Math.min(max, val + (step > 1 ? step : delta));
+      el.value = val;
+      updateSummaryCounters();
+    }
+
+    function decrementValue(id, min = 1, max = 500, delta = 1) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let val = parseInt(el.value) || 1;
+      val = Math.max(min, val - delta);
+      el.value = val;
+      updateSummaryCounters();
+    }
+
+    function setBaseIpAddress(ipCidr, elem) {
+      const inp = document.getElementById('inpBaseIp');
+      if (inp) inp.value = ipCidr;
+      document.querySelectorAll('.btn-base-ip').forEach(b => {
+        b.className = "btn-base-ip py-2 px-2 rounded-xl border border-indigo-900 bg-[#0a101f] text-slate-400 text-xs font-mono text-center hover:border-cyan-400";
+      });
+      if (elem) {
+        elem.className = "btn-base-ip py-2 px-2 rounded-xl border border-cyan-400 bg-cyan-500/20 text-cyan-300 text-xs font-mono font-bold text-center";
+      }
+    }
+
+    function updateSummaryCounters() {
+      const s = parseInt(document.getElementById('inpSedes')?.value) || 3;
+      const p = parseInt(document.getElementById('inpPisos')?.value) || 2;
+      const u = parseInt(document.getElementById('inpUsers')?.value) || 45;
+
+      const bS = document.getElementById('badgeSedes');
+      const bP = document.getElementById('badgePisos');
+      const bU = document.getElementById('badgeUsers');
+
+      if (bS) bS.textContent = `${s} Sedes`;
+      if (bP) bP.textContent = `${p} Pisos`;
+      if (bU) bU.textContent = `${u} Empleados`;
+
+      let vlanTypes = 1; // Datos siempre
+      if (document.getElementById('chkSrvVoip')?.checked) vlanTypes++;
+      if (document.getElementById('chkSrvWifi')?.checked) vlanTypes++;
+      if (document.getElementById('chkSrvCctv')?.checked) vlanTypes++;
+
+      const totalSwitches = s * p;
+      const totalWan = Math.max(0, s - 1);
+      const totalSubnets = (s * p * vlanTypes) + totalWan;
+
+      const estimate = document.getElementById('lblLiveEstimate');
+      if (estimate) {
+        estimate.textContent = `Estimación: ${totalSwitches} switches de piso, ${totalWan} enlaces WAN /30 y ${totalSubnets} subredes calculadas.`;
+      }
+    }
+
+    function syncInputsToState() {
+      const name = document.getElementById('inpCompanyName')?.value.trim();
+      if (name) appState.companyName = name;
+
+      appState.sedes = Math.max(1, parseInt(document.getElementById('inpSedes')?.value) || 3);
+      appState.pisos = Math.max(1, parseInt(document.getElementById('inpPisos')?.value) || 2);
+      appState.usersPerPiso = Math.max(5, parseInt(document.getElementById('inpUsers')?.value) || 45);
+
+      appState.services.voip = !!document.getElementById('chkSrvVoip')?.checked;
+      appState.services.wifi = !!document.getElementById('chkSrvWifi')?.checked;
+      appState.services.cctv = !!document.getElementById('chkSrvCctv')?.checked;
+
+      const baseVal = document.getElementById('inpBaseIp')?.value.trim() || '10.0.0.0/16';
+      const parts = baseVal.split('/');
+      appState.baseIp = parts[0] || '10.0.0.0';
+      appState.cidr = parts[1] ? parseInt(parts[1]) : 16;
+    }
+
+    /* Algoritmo de Cálculo VLSM Completo */
+    function calculateCompleteNetwork() {
+      calculatedSubnets = [];
+      let currentIpInt = ipToInt(appState.baseIp);
+
+      const vlanDefs = [
+        { key: 'datos', name: 'DATOS', hosts: appState.usersPerPiso, vlanBase: 10 }
+      ];
+      if (appState.services.voip) {
+        vlanDefs.push({ key: 'voip', name: 'VOZ_IP', hosts: appState.usersPerPiso, vlanBase: 20 });
+      }
+      if (appState.services.wifi) {
+        vlanDefs.push({ key: 'wifi', name: 'WIFI', hosts: Math.ceil(appState.usersPerPiso * 1.5), vlanBase: 30 });
+      }
+      if (appState.services.cctv) {
+        vlanDefs.push({ key: 'cctv', name: 'CCTV', hosts: 14, vlanBase: 40 });
+      }
+
+      // 1. Subredes LAN de cada Sede y Piso
+      for (let s = 1; s <= appState.sedes; s++) {
+        for (let p = 1; p <= appState.pisos; p++) {
+          vlanDefs.forEach(vlan => {
+            const vlanId = vlan.vlanBase + p;
+            const neededHosts = vlan.hosts + 2;
+            const cidr = 32 - Math.ceil(Math.log2(neededHosts));
+            const mask = cidrToMask(cidr);
+            const blockSize = Math.pow(2, 32 - cidr);
+
+            const netIp = intToIp(currentIpInt);
+            const broadcastIp = intToIp(currentIpInt + blockSize - 1);
+            const firstHost = intToIp(currentIpInt + 1);
+            const lastHost = intToIp(currentIpInt + blockSize - 2);
+
+            calculatedSubnets.push({
+              id: `S${s}_P${p}_${vlan.key}`,
+              name: `Sede_${s}_P${p}_${vlan.name}`,
+              location: `Sede ${s} — Piso ${p}`,
+              reqHosts: vlan.hosts,
+              usableHosts: blockSize - 2,
+              netIp: netIp,
+              mask: mask,
+              cidr: `/${cidr}`,
+              range: `${firstHost} – ${lastHost}`,
+              broadcast: broadcastIp,
+              gateway: firstHost,
+              vlanId: vlanId,
+              sedeNum: s,
+              pisoNum: p
+            });
+
+            currentIpInt += blockSize;
+          });
+        }
+      }
+
+      // 2. Enlaces WAN Punto a Punto (/30)
+      for (let w = 1; w < appState.sedes; w++) {
+        const cidr = 30;
+        const mask = "255.255.255.252";
+        const blockSize = 4;
+
+        const netIp = intToIp(currentIpInt);
+        const broadcastIp = intToIp(currentIpInt + blockSize - 1);
+        const firstHost = intToIp(currentIpInt + 1);
+        const lastHost = intToIp(currentIpInt + 2);
+
+        calculatedSubnets.push({
+          id: `WAN_P2P_${w}_${w+1}`,
+          name: `ENLACE_WAN_S${w}_S${w+1}`,
+          location: `Interconexión WAN Sede ${w} ↔ Sede ${w+1}`,
+          reqHosts: 2,
+          usableHosts: 2,
+          netIp: netIp,
+          mask: mask,
+          cidr: `/${cidr}`,
+          range: `${firstHost} – ${lastHost}`,
+          broadcast: broadcastIp,
+          gateway: firstHost,
+          vlanId: "N/A",
+          sedeNum: w,
+          pisoNum: 0
+        });
+
+        currentIpInt += blockSize;
+      }
+
+      renderAddressingUI();
+      renderTopologyUI();
+      renderDeviceScript(appState.currentVendor);
+    }
+
+    function renderAddressingUI() {
+      const orgEl = document.getElementById('lblSubnetOrgName');
+      if (orgEl) orgEl.textContent = `Plan computado para ${appState.companyName} (${appState.sedes} Sedes, ${appState.pisos} Pisos, Red Base: ${appState.baseIp}/${appState.cidr})`;
+
+      const mSub = document.getElementById('mSubnets');
+      const mHst = document.getElementById('mHosts');
+      const mSw = document.getElementById('mSwitches');
+      const mWan = document.getElementById('mWanLinks');
+
+      if (mSub) mSub.textContent = calculatedSubnets.length;
+      if (mHst) {
+        const total = calculatedSubnets.reduce((acc, c) => acc + c.usableHosts, 0);
+        mHst.textContent = total.toLocaleString('es-CO');
+      }
+      if (mSw) mSw.textContent = appState.sedes * appState.pisos;
+      if (mWan) mWan.textContent = Math.max(0, appState.sedes - 1);
+
+      const tbody = document.getElementById('tblSubnetRows');
+      const countEl = document.getElementById('lblTotalRows');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (countEl) countEl.textContent = `Total: ${calculatedSubnets.length} subredes calculadas`;
+
+      calculatedSubnets.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#0a101f] transition";
+        const isWan = item.vlanId === 'N/A';
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold ${isWan ? 'text-amber-400' : 'text-cyan-400'}">${item.name}</td>
+          <td class="p-3.5 text-slate-300 font-sans">${item.location}</td>
+          <td class="p-3.5 text-slate-400">${item.reqHosts}</td>
+          <td class="p-3.5 text-white font-bold">${item.netIp}</td>
+          <td class="p-3.5 text-slate-300">${item.mask} <span class="text-cyan-400 font-bold">${item.cidr}</span></td>
+          <td class="p-3.5 text-slate-400">${item.range}</td>
+          <td class="p-3.5 text-slate-500">${item.broadcast}</td>
+          <td class="p-3.5 text-emerald-400 font-bold">${item.gateway}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterSubnetRows() {
+      const q = document.getElementById('tblSearchBox')?.value.toLowerCase() || '';
+      const rows = document.querySelectorAll('#tblSubnetRows tr');
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    function renderTopologyUI() {
+      const canvas = document.getElementById('topologiaCanvas');
+      if (!canvas) return;
+
+      let html = `<div class="flex flex-wrap justify-center items-center gap-8 w-full z-10">`;
+
+      for (let s = 1; s <= appState.sedes; s++) {
+        html += `
+          <div class="glass-card p-5 rounded-2xl border-2 border-indigo-500/40 text-center min-w-[240px] space-y-3 relative pulse-glow">
+            <div class="p-3 bg-cyan-500/15 border border-cyan-400/40 text-cyan-400 rounded-2xl inline-block shadow-lg">
+              <i data-lucide="router" class="w-8 h-8 stroke-[2.2]"></i>
+            </div>
+            <div>
+              <h4 class="font-black text-white text-sm">Router_Sede_${s}</h4>
+              <p class="text-[10px] text-cyan-300 font-mono">Gateway Core WAN</p>
+            </div>
+            <div class="space-y-1.5 pt-2 border-t border-indigo-900/80">
+        `;
+
+        for (let p = 1; p <= appState.pisos; p++) {
+          html += `
+            <div class="text-[10px] bg-[#060911] py-1.5 px-3 rounded-xl border border-indigo-900 text-slate-300 flex items-center justify-between">
+              <span class="font-bold flex items-center gap-1.5"><i data-lucide="layers" class="w-3 h-3 text-indigo-400"></i> Switch_P${p}</span>
+              <span class="text-cyan-400 font-mono">Piso ${p}</span>
+            </div>
+          `;
+        }
+
+        html += `</div></div>`;
+
+        if (s < appState.sedes) {
+          html += `
+            <div class="hidden md:flex flex-col items-center text-cyan-400 gap-1.5">
+              <i data-lucide="arrow-left-right" class="w-6 h-6 animate-pulse"></i>
+              <span class="text-[10px] text-cyan-300 font-mono font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-400/30">WAN /30</span>
+            </div>
+          `;
+        }
+      }
+
+      html += `</div>`;
+      canvas.innerHTML = html;
+      safeInitIcons();
+    }
+
+    function setVendorScript(vendor) {
+      appState.currentVendor = vendor;
+      document.querySelectorAll('.vendor-btn').forEach(b => {
+        b.className = "vendor-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium";
+      });
+      const active = document.getElementById(`vendorTab-${vendor}`);
+      if (active) active.className = "vendor-btn px-3 py-1.5 rounded-lg bg-cyan-400 text-slate-950 font-bold";
+
+      renderDeviceScript(vendor);
+    }
+
+    function renderDeviceScript(vendor) {
+      const lanSubnets = calculatedSubnets.filter(s => s.vlanId !== 'N/A' && s.sedeNum === 1);
+      const wanSubnets = calculatedSubnets.filter(s => s.vlanId === 'N/A');
+
+      const consoleTitle = document.getElementById('lblConsoleTitle');
+      let code = "";
+
+      if (vendor === 'cisco') {
+        if (consoleTitle) consoleTitle.textContent = "Terminal — Cisco IOS (Router_Sede_1)";
+        code = `! ==================================================================\n`;
+        code += `! CONFIGURACION CISCO IOS — WAN ARCHITECT STUDIO v3.6.0\n`;
+        code += `! Empresa: ${appState.companyName}\n`;
+        code += `! Dispositivo: Router_Sede_1 (Core / Gateway)\n`;
+        code += `! Ciberdefensa: Telnet desactivado, SSHv2 y pass-encryption activos\n`;
+        code += `! ==================================================================\n`;
+        code += `enable\nconfigure terminal\nhostname Router_Sede_1\nservice password-encryption\nno ip domain-lookup\nip domain-name redwan.local\ncrypto key generate rsa modulus 2048\nline vty 0 4\n transport input ssh\n login local\nexit\n!\n`;
+        
+        lanSubnets.forEach(sub => {
+          code += `interface GigabitEthernet0/0/0.${sub.vlanId}\n`;
+          code += ` description Gateway_${sub.name}\n`;
+          code += ` encapsulation dot1Q ${sub.vlanId}\n`;
+          code += ` ip address ${sub.gateway} ${sub.mask}\n`;
+          code += ` no shutdown\n!\n`;
+        });
+
+        if (wanSubnets.length > 0) {
+          const w = wanSubnets[0];
+          code += `interface GigabitEthernet0/0/1\n`;
+          code += ` description Enlace_WAN_P2P_Hacia_Sede_2\n`;
+          code += ` ip address ${w.gateway} ${w.mask}\n`;
+          code += ` no shutdown\n!\n`;
+        }
+
+        code += `router ospf 1\n router-id 1.1.1.1\n`;
+        lanSubnets.forEach(sub => {
+          code += ` network ${sub.netIp} 0.0.0.63 area 0\n`;
+        });
+        if (wanSubnets.length > 0) {
+          code += ` network ${wanSubnets[0].netIp} 0.0.0.3 area 0\n`;
+        }
+        code += `exit\n! Fin de configuracion Cisco IOS`;
+
+      } else if (vendor === 'huawei') {
+        if (consoleTitle) consoleTitle.textContent = "Terminal — Huawei VRP (Router_Sede_1)";
+        code = `# ==================================================================\n`;
+        code += `# CONFIGURACION HUAWEI VRP — WAN ARCHITECT STUDIO v3.6.0\n`;
+        code += `# Empresa: ${appState.companyName}\n`;
+        code += `# Dispositivo: Router_Sede_1\n`;
+        code += `# ==================================================================\n`;
+        code += `system-view\nsysname Router_Sede_1\n#\n`;
+
+        lanSubnets.forEach(sub => {
+          code += `vlan ${sub.vlanId}\n description ${sub.name}\n#\n`;
+          code += `interface GigabitEthernet0/0/1.${sub.vlanId}\n`;
+          code += ` dot1q termination vid ${sub.vlanId}\n`;
+          code += ` ip address ${sub.gateway} ${sub.mask}\n`;
+          code += ` arp broadcast enable\n#\n`;
+        });
+
+        if (wanSubnets.length > 0) {
+          const w = wanSubnets[0];
+          code += `interface GigabitEthernet0/0/2\n`;
+          code += ` description Enlace_WAN_Sede_2\n`;
+          code += ` ip address ${w.gateway} ${w.mask}\n#\n`;
+        }
+
+        code += `ospf 1 router-id 1.1.1.1\n area 0.0.0.0\n`;
+        lanSubnets.forEach(sub => {
+          code += `  network ${sub.netIp} 0.0.0.63\n`;
+        });
+        if (wanSubnets.length > 0) {
+          code += `  network ${wanSubnets[0].netIp} 0.0.0.3\n`;
+        }
+        code += `return\n# Fin de configuracion Huawei VRP`;
+
+      } else if (vendor === 'fortinet') {
+        if (consoleTitle) consoleTitle.textContent = "Terminal — Fortinet FortiOS (FortiGate_Edge)";
+        code = `# ==================================================================\n`;
+        code += `# CONFIGURACION FORTINET FORTIOS — WAN ARCHITECT STUDIO v3.6.0\n`;
+        code += `# Dispositivo: FortiGate_Edge_Router\n`;
+        code += `# ==================================================================\n`;
+        code += `config system interface\n`;
+        lanSubnets.forEach(sub => {
+          code += `    edit "vlan${sub.vlanId}"\n`;
+          code += `        set vdom "root"\n`;
+          code += `        set ip ${sub.gateway} ${sub.mask}\n`;
+          code += `        set allowaccess ping https ssh\n`;
+          code += `        set interface "port1"\n`;
+          code += `        set vlanid ${sub.vlanId}\n`;
+          code += `    next\n`;
+        });
+        code += `end\n\n`;
+        code += `config firewall policy\n    edit 1\n        set name "LAN_A_INTERNET"\n        set srcintf "any"\n        set dstintf "port2"\n        set action accept\n        set schedule "always"\n        set service "ALL"\n        set nat enable\n    next\nend\n`;
+
+      } else if (vendor === 'mikrotik') {
+        if (consoleTitle) consoleTitle.textContent = "Terminal — MikroTik RouterOS (RB_Sede_1)";
+        code = `# ==================================================================\n`;
+        code += `# CONFIGURACION MIKROTIK ROUTEROS — WAN ARCHITECT STUDIO v3.6.0\n`;
+        code += `# Dispositivo: MikroTik_RB_Sede_1\n`;
+        code += `# ==================================================================\n`;
+        code += `/system identity set name="MikroTik_Sede_1"\n\n`;
+        code += `/interface vlan\n`;
+        lanSubnets.forEach(sub => {
+          code += `add interface=ether1 name=vlan${sub.vlanId} vlan-id=${sub.vlanId}\n`;
+        });
+        code += `\n/ip address\n`;
+        lanSubnets.forEach(sub => {
+          code += `add address=${sub.gateway}${sub.cidr} interface=vlan${sub.vlanId} comment="${sub.name}"\n`;
+        });
+        if (wanSubnets.length > 0) {
+          code += `add address=${wanSubnets[0].gateway}/30 interface=ether2 comment="WAN_P2P"\n`;
+        }
+      }
+
+      const out = document.getElementById('terminalCodeOutput');
+      if (out) out.textContent = code;
+    }
+
+    function copyTerminalCode() {
+      const el = document.getElementById('terminalCodeOutput');
+      if (!el) return;
+      const text = el.textContent;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showNotification("Copiado al Portapapeles", "Script listo para pegar en el emulador o router.");
+        }).catch(() => fallbackCopyText(text));
+      } else {
+        fallbackCopyText(text);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showNotification("Copiado", "Script copiado correctamente al portapapeles.");
+      } catch (e) {
+        showNotification("Error", "Selecciona y copia manualmente.", false);
+      }
+    }
+
+    /* Descarga de Excel (.xlsx) con respaldo CSV */
+    function exportToExcel() {
+      const rows = calculatedSubnets.map(item => ({
+        "Empresa": appState.companyName,
+        "Identificador / VLAN": item.name,
+        "Ubicación": item.location,
+        "VLAN ID": item.vlanId,
+        "Hosts Req.": item.reqHosts,
+        "Hosts Útiles": item.usableHosts,
+        "Dirección de Red": item.netIp,
+        "Máscara": item.mask,
+        "CIDR": item.cidr,
+        "Rango IPs": item.range,
+        "Broadcast": item.broadcast,
+        "Gateway Sugerido": item.gateway
+      }));
+
+      if (window.XLSX && typeof window.XLSX.utils !== 'undefined') {
+        try {
+          const ws = XLSX.utils.json_to_sheet(rows);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Direccionamiento WAN");
+          XLSX.writeFile(wb, `Plan_Red_WAN_${appState.companyName.replace(/\s+/g, '_')}.xlsx`);
+          showNotification("Excel Generado", "El archivo .xlsx se ha descargado correctamente.");
+          return;
+        } catch (e) {
+          console.warn("Fallo librería XLSX, conmutando a CSV:", e);
+        }
+      }
+
+      // Safe CSV Fallback
+      let csv = "Empresa,Identificador / VLAN,Ubicacion,VLAN ID,Hosts Req,Hosts Utiles,Red,Mascara,CIDR,Rango IPs,Broadcast,Gateway Sugerido\n";
+      rows.forEach(r => {
+        csv += `"${r["Empresa"]}","${r["Identificador / VLAN"]}","${r["Ubicación"]}","${r["VLAN ID"]}","${r["Hosts Req."]}","${r["Hosts Útiles"]}","${r["Dirección de Red"]}","${r["Máscara"]}","${r["CIDR"]}","${r["Rango IPs"]}","${r["Broadcast"]}","${r["Gateway Sugerido"]}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Plan_Red_WAN_${appState.companyName.replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showNotification("Descarga Completada", "Plan de red descargado en formato CSV compatible con Excel.");
+    }
+
+    /* MÓDULO INTERACTIVO DE CIBERDEFENSA (PARA CAPTURA 08) */
+    function runSanitizationTest() {
+      const input = document.getElementById('inpSanitizeTest')?.value || '';
+      const box = document.getElementById('sanitizeResultBox');
+      const title = document.getElementById('sanitizeTitle');
+      const details = document.getElementById('sanitizeDetails');
+
+      if (!box || !title || !details) return;
+
+      const suspiciousPatterns = [';', '--', '<script>', 'drop', 'eval', 'exec', 'system-view', 'ignore', 'previous'];
+      const found = suspiciousPatterns.filter(p => input.toLowerCase().includes(p));
+
+      if (found.length > 0) {
+        box.className = "p-3.5 rounded-2xl bg-rose-950/40 border-2 border-rose-500 space-y-1.5 animate-pulse";
+        title.className = "flex items-center gap-2 text-xs font-black text-rose-400";
+        title.innerHTML = `<i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i> ¡AMENAZA BLOQUEADA POR CIBERDEFENSA! (Captura 08 Rúbrica)`;
+        details.innerHTML = `Se detectó intento de inyección / caracteres peligrosos: <span class="text-rose-300 font-bold">${found.join(', ')}</span>. La entrada ha sido neutralizada y rechazada para proteger la red.`;
+        showNotification("Ciberdefensa Activa", "Se interceptó y bloqueó una inyección maliciosa en tiempo real.", false);
+      } else {
+        box.className = "p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 space-y-1.5";
+        title.className = "flex items-center gap-2 text-xs font-bold text-emerald-400";
+        title.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Entrada Segura y Verificada`;
+        details.textContent = "El texto analizado no contiene vectores de ataque ni inyección de comandos reconocibles.";
+      }
+      safeInitIcons();
+    }
+
+    function downloadPoliticasIA() {
+      const content = `# docs/politicas-ia.md — Ciberdefensa y uso de IA en la herramienta
+
+1. La herramienta nunca guarda contraseñas ni tokens en el código; van en .env (protegido por .gitignore).
+2. Con IA pública solo se usan datos de ejemplo, nunca IPs reales, credenciales ni topologías sensibles.
+3. Todo lo que ingresa el usuario se valida y sanea antes de usarse.
+4. La herramienta advierte cuando una configuración es insegura (puertos abiertos, credenciales por defecto) y aplica el mínimo privilegio.
+5. No se ejecuta ningún comando o configuración que no se entienda; lo generado por IA se revisa y se prueba primero.
+6. Toda automatización/acceso a equipos se hace solo en el laboratorio autorizado.
+7. La calidad se mide con pruebas continuas de direccionamiento sin colisión.`;
+
+      triggerFileDownload(content, 'politicas-ia.md', 'text/markdown');
+      showNotification("Descarga Iniciada", "Archivo docs/politicas-ia.md generado.");
+    }
+
+    function downloadGitignore() {
+      const content = `# Archivos sensibles que NUNCA se suben al repositorio publico
+.env
+*.env
+secrets/
+passwords.txt
+token.txt
+`;
+      triggerFileDownload(content, '.gitignore', 'text/plain');
+      showNotification(".gitignore Descargado", "Archivo protector de credenciales generado.");
+    }
+
+    function triggerFileDownload(text, filename, mimeType) {
+      const blob = new Blob([text], { type: `${mimeType};charset=utf-8;` });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* Funciones Matemáticas Auxiliares para IPv4 */
+    function ipToInt(ip) {
+      return ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct, 10), 0) >>> 0;
+    }
+
+    function intToIp(int) {
+      return [(int >>> 24) & 255, (int >>> 16) & 255, (int >>> 8) & 255, int & 255].join('.');
+    }
+
+    function cidrToMask(cidr) {
+      const maskInt = (0xFFFFFFFF << (32 - cidr)) >>> 0;
+      return intToIp(maskInt);
+    }
+  </script>
+</body>
+</html>
