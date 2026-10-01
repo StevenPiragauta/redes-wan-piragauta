@@ -1,0 +1,6 @@
+# Secretos y variables de entorno que NUNCA se suben al repositorio publico
+.env
+*.env
+secrets/
+passwords.txt
+token.txt
